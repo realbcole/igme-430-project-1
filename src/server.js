@@ -17,11 +17,13 @@ const urlStruct = {
   },
   HEAD: {
     '/getRooms': responseHandler.getRoomsMeta,
+    '/getRoom': responseHandler.getRoomMeta,
     notFound: responseHandler.notFoundMeta,
   },
   POST: {
-    '/addUser': responseHandler.addUser,
     '/addRoom': responseHandler.addRoom,
+    '/vote': responseHandler.vote,
+    notFound: responseHandler.notFound,
   },
 };
 

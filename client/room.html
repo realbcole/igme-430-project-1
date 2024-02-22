@@ -6,22 +6,11 @@
     <link rel="stylesheet" type="text/css" href="/roomStyle.css">
 
     <script>
-        const handleResponse = async (res) => {
-            const userList = document.querySelector('#userList');
+        let voteYes, voteAbstain, voteNo;
+        let roomCode;
 
-            const data = await res.json();
-
-            console.log(data);
-
-            if (res.status === 200) {
-                const users = Object.keys(data.room.users);
-                userList.innerHTML = users.join('<br>');
-            } else {
-                userList.innerHTML = 'Error';
-            }
-        };
-
-        const getRoom = async (roomCode) => {
+        const fetchVotes = async () => {
+            // fetch the votes from the server
             const url = `/getRoom?code=${roomCode}`;
 
             let response = await fetch(url, {
@@ -31,15 +20,72 @@
                 },
             });
 
-            handleResponse(response);
+            const data = await response.json();
+
+            // update the vote counts
+            document.querySelector('#yes').innerHTML = `${data.room.votes.yes}`;
+            document.querySelector('#abstain').innerHTML = `${data.room.votes.abstain}`;
+            document.querySelector('#no').innerHTML = `${data.room.votes.no}`;
         };
 
+        const viewVotes = async () => {
+            fetchVotes();
+            setInterval(fetchVotes, 3000);
+        }
+
+        const sendVote = async (vote) => {
+            // send the vote to the server
+            const data = `vote=${vote}&room=${roomCode}`;
+
+            let response = await fetch('/vote', {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                body: data,
+            });
+
+            // reset the vote counts
+            document.querySelector('#yes').innerHTML = 0;
+            document.querySelector('#abstain').innerHTML = 0;
+            document.querySelector('#no').innerHTML = 0;
+
+            // update the vote that was just cast
+            if (vote === 'yes') {
+                document.querySelector('#yes').innerHTML = 1;
+            } else if (vote === 'abstain') {
+                document.querySelector('#abstain').innerHTML = 1;
+            } else if (vote === 'no') {
+                document.querySelector('#no').innerHTML = 1;
+            }
+
+            // remove click event listeners so that the user can't vote again
+            document.querySelector('#yes').removeEventListener('click', voteYes);
+            document.querySelector('#abstain').removeEventListener('click', voteAbstain);
+            document.querySelector('#no').removeEventListener('click', voteNo);
+
+            // remove the cursor: pointer style from the buttons
+            document.querySelector('#yes').style.cursor = 'default';
+            document.querySelector('#abstain').style.cursor = 'default';
+            document.querySelector('#no').style.cursor = 'default';
+
+            viewVotes();
+        };
+
+        voteYes = () => sendVote('yes');
+        voteAbstain = () => sendVote('abstain');
+        voteNo = () => sendVote('no');
+
         const init = () => {
+            // get the room code from the URL
             const urlParams = new URLSearchParams(window.location.search);
-            const roomCode = urlParams.get('code');
+            roomCode = urlParams.get('code');
             document.querySelector('#code').innerHTML = roomCode;
 
-            getRoom(roomCode);
+            // add click event listeners to the buttons
+            document.querySelector('#yes').addEventListener('click', voteYes);
+            document.querySelector('#abstain').addEventListener('click', voteAbstain);
+            document.querySelector('#no').addEventListener('click', voteNo);
         };
 
         window.onload = init;
@@ -48,14 +94,10 @@
 
 <body>
     <div class="code">Room Code: <span id="code"></span></div>
-    <!-- <div>
-        <h3>Users:</h3>
-        <p id="userList"></p>
-    </div> -->
     <div class="btns">
-        <button class="yes-btn">Yes</button>
-        <button class="abstain-btn">Abstain</button>
-        <button class="no-btn">No</button>
+        <button class="yes-btn" id="yes">Yes</button>
+        <button class="abstain-btn" id="abstain">Abstain</button>
+        <button class="no-btn" id="no">No</button>
     </div>
 </body>
 

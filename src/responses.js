@@ -65,6 +65,10 @@ const getRoom = (req, res) => {
   return respond(res, 404, JSON.stringify({ message: 'Room not found' }), 'application/json');
 };
 
+const getRoomMeta = (req, res) => {
+  respondMeta(res, 200, 'application/json');
+};
+
 const addRoom = (req, res, bodyParams) => {
   if (!bodyParams.room || !bodyParams.name) {
     return respond(res, 400, JSON.stringify({ message: 'Name and Room are both required' }), 'application/json');
@@ -73,7 +77,7 @@ const addRoom = (req, res, bodyParams) => {
   let responseCode = 204;
   if (!rooms[bodyParams.room]) {
     responseCode = 201;
-    rooms[bodyParams.room] = { users: {} };
+    rooms[bodyParams.room] = { users: {}, votes: { yes: 0, abstain: 0, no: 0 } };
   }
 
   rooms[bodyParams.room].users = rooms[bodyParams.room].users || {};
@@ -88,6 +92,26 @@ const addRoom = (req, res, bodyParams) => {
   return respond(res, 201, JSON.stringify({ message: 'Created Successfully' }), 'application/json');
 };
 
+const vote = (req, res, bodyParams) => {
+  if (!bodyParams.room || !bodyParams.vote) {
+    return respond(res, 400, JSON.stringify({ message: 'Room code and vote are required' }), 'application/json');
+  }
+
+  if (!rooms[bodyParams.room]) {
+    return respond(res, 404, JSON.stringify({ message: 'Room not found' }), 'application/json');
+  }
+
+  if (bodyParams.vote === 'yes') {
+    rooms[bodyParams.room].votes.yes++;
+  } else if (bodyParams.vote === 'no') {
+    rooms[bodyParams.room].votes.no++;
+  } else if (bodyParams.vote === 'abstain') {
+    rooms[bodyParams.room].votes.abstain++;
+  }
+
+  return respondMeta(res, 204, 'application/json');
+};
+
 module.exports = {
   parseBody,
   notFound,
@@ -96,4 +120,6 @@ module.exports = {
   getRoomsMeta,
   addRoom,
   getRoom,
+  getRoomMeta,
+  vote,
 };

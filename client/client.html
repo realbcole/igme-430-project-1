@@ -6,39 +6,10 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
 
   <script>
-    const handleResponse = async (res, method, roomCode) => {
-      const content = document.querySelector('#content');
-
-      switch (res.status) {
-        case 200: //success
-          content.innerHTML = `<b>Success</b>`;
-          break;
-        case 201: //created
-          content.innerHTML = '<b>Created</b>';
-          break;
-        case 204: //updated
-          content.innerHTML = '<b>Updated (No Content)</b>';
-          break;
-        case 400: //bad request
-          content.innerHTML = `<b>Bad Request</b>`;
-          break;
-        case 404: //not found
-          content.innerHTML = `<b>Not Found</b>`;
-          break;
-        default: //any other status code
-          content.innerHTML = `Error code not implemented by client.`;
-          break;
-      }
-
-      if (method === 'post') {
-        window.location.href = `/room?code=${roomCode}`;
-      }
-    };
-
     const sendPost = async (form) => {
+      // create or join a room
       const url = form.getAttribute('action');
       const method = form.getAttribute('method');
-
       const nameField = form.querySelector('#nameField');
       const roomField = form.querySelector('#roomField');
 
@@ -53,26 +24,13 @@
         body: formData,
       });
 
-      handleResponse(response, method, roomField.value);
-    };
-
-    const sendGet = async (form) => {
-      const url = form.querySelector('#urlField');
-      const method = form.querySelector('#methodSelect');
-
-      let response = await fetch(url.value, {
-        method: method.value,
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-
-      handleResponse(response, method.value);
+      // redirect to the room
+      window.location.href = `/room?code=${roomField.value}`;
     };
 
     const init = () => {
-      const userForm = document.querySelector('#userForm');
       const roomForm = document.querySelector('#roomForm');
+
 
       const addRoom = (e) => {
         e.preventDefault();
@@ -80,14 +38,7 @@
         return false;
       }
 
-      const getRooms = (e) => {
-        e.preventDefault();
-        sendGet(userForm);
-        return false;
-      }
-
       roomForm.addEventListener('submit', addRoom);
-      userForm.addEventListener('submit', getRooms);
     };
 
     window.onload = init;
@@ -95,28 +46,13 @@
 </head>
 
 <body>
-  <section id="top">
-    <form id="roomForm" action="/addRoom" method="post">
-      <label for="name">Name: </label>
-      <input id="nameField" type="text" name="name" />
-      <label for="room">Room Code: </label>
-      <input id="roomField" type="text" name="room" />
-      <input type="submit" value="Create/Join Room" />
-    </form>
-    <form id="userForm" action="/getRooms" method="get">
-      <select id='urlField'>
-        <option value='/getRooms'>/getRooms</option>
-        <option value='/notReal'>/notReal</option>
-      </select>
-      <select id="methodSelect">
-        <option value="get">GET</option>
-        <option value="head">HEAD</option>
-      </select>
-      <input type="submit" value="Get Rooms" />
-    </form>
-  </section>
-  <section id="content">
-  </section>
+  <form id="roomForm" action="/addRoom" method="post">
+    <label for="name">Name: </label>
+    <input id="nameField" type="text" name="name" />
+    <label for="room">Room Code: </label>
+    <input id="roomField" type="text" name="room" />
+    <input type="submit" value="Create/Join Room" />
+  </form>
 </body>
 
 </html>
