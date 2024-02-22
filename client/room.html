@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Voting Room</title>
+    <link rel="stylesheet" type="text/css" href="/roomStyle.css">
+
+    <script>
+        const handleResponse = async (res) => {
+            const userList = document.querySelector('#userList');
+
+            const data = await res.json();
+
+            console.log(data);
+
+            if (res.status === 200) {
+                const users = Object.keys(data.room.users);
+                userList.innerHTML = users.join('<br>');
+            } else {
+                userList.innerHTML = 'Error';
+            }
+        };
+
+        const getRoom = async (roomCode) => {
+            const url = `/getRoom?code=${roomCode}`;
+
+            let response = await fetch(url, {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+
+            handleResponse(response);
+        };
+
+        const init = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomCode = urlParams.get('code');
+            document.querySelector('#code').innerHTML = roomCode;
+
+            getRoom(roomCode);
+        };
+
+        window.onload = init;
+    </script>
+</head>
+
+<body>
+    <div class="code">Room Code: <span id="code"></span></div>
+    <!-- <div>
+        <h3>Users:</h3>
+        <p id="userList"></p>
+    </div> -->
+    <div class="btns">
+        <button class="yes-btn">Yes</button>
+        <button class="abstain-btn">Abstain</button>
+        <button class="no-btn">No</button>
+    </div>
+</body>
+
+</html>

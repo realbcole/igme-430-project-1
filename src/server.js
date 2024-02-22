@@ -9,15 +9,19 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS,
-    '/getUsers': responseHandler.getUsers,
+    '/getRooms': responseHandler.getRooms,
+    '/getRoom': responseHandler.getRoom,
+    '/room': htmlHandler.getRoom,
+    '/roomStyle.css': htmlHandler.getRoomCSS,
     notFound: responseHandler.notFound,
   },
   HEAD: {
-    '/getUsers': responseHandler.getUsersMeta,
+    '/getRooms': responseHandler.getRoomsMeta,
     notFound: responseHandler.notFoundMeta,
   },
   POST: {
     '/addUser': responseHandler.addUser,
+    '/addRoom': responseHandler.addRoom,
   },
 };
 
@@ -27,6 +31,9 @@ const onRequest = (req, res) => {
   if (!urlStruct[req.method]) return urlStruct.HEAD.notFound(req, res);
 
   if (urlStruct[req.method][parsedUrl.pathname]) {
+    if (req.method === 'POST') {
+      return responseHandler.parseBody(req, res, urlStruct[req.method][parsedUrl.pathname]);
+    }
     return urlStruct[req.method][parsedUrl.pathname](req, res);
   }
 

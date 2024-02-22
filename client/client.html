@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
 
   <script>
-    const handleResponse = async (res, method) => {
+    const handleResponse = async (res, method, roomCode) => {
       const content = document.querySelector('#content');
 
       switch (res.status) {
@@ -18,7 +18,7 @@
           break;
         case 204: //updated
           content.innerHTML = '<b>Updated (No Content)</b>';
-          return;
+          break;
         case 400: //bad request
           content.innerHTML = `<b>Bad Request</b>`;
           break;
@@ -30,26 +30,22 @@
           break;
       }
 
-      let obj = await res.json();
-      if (obj.message) {
-        content.innerHTML += `<p>Message: ${obj.message}</p>`;
-      }
-      if (obj.users) {
-        content.innerHTML += `<p>${JSON.stringify(obj.users)}</p>`;
+      if (method === 'post') {
+        window.location.href = `/room?code=${roomCode}`;
       }
     };
 
-    const sendPost = async (nameForm) => {
-      const nameAction = nameForm.getAttribute('action');
-      const nameMethod = nameForm.getAttribute('method');
+    const sendPost = async (form) => {
+      const url = form.getAttribute('action');
+      const method = form.getAttribute('method');
 
-      const nameField = nameForm.querySelector('#nameField');
-      const ageField = nameForm.querySelector('#ageField');
+      const nameField = form.querySelector('#nameField');
+      const roomField = form.querySelector('#roomField');
 
-      const formData = `name=${nameField.value}&age=${ageField.value}`;
+      const formData = `name=${nameField.value}&room=${roomField.value}`;
 
-      let response = await fetch(nameAction, {
-        method: nameMethod,
+      let response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
@@ -57,43 +53,41 @@
         body: formData,
       });
 
-      handleResponse(response);
+      handleResponse(response, method, roomField.value);
     };
 
-    const sendGet = async (userForm) => {
-      const userAction = userForm.getAttribute('action');
-      const userMethod = userForm.getAttribute('method');
-      const urlField = userForm.querySelector('#urlField');
-      const methodSelect = userForm.querySelector('#methodSelect');
+    const sendGet = async (form) => {
+      const url = form.querySelector('#urlField');
+      const method = form.querySelector('#methodSelect');
 
-      let response = await fetch(urlField.value, {
-        method: methodSelect.value,
+      let response = await fetch(url.value, {
+        method: method.value,
         headers: {
           'Accept': 'application/json',
         },
       });
 
-      handleResponse(response, methodSelect.value);
+      handleResponse(response, method.value);
     };
 
     const init = () => {
-      const nameForm = document.querySelector('#nameForm');
       const userForm = document.querySelector('#userForm');
+      const roomForm = document.querySelector('#roomForm');
 
-      const addUser = (e) => {
+      const addRoom = (e) => {
         e.preventDefault();
-        sendPost(nameForm);
+        sendPost(roomForm);
         return false;
       }
 
-      const getUser = (e) => {
+      const getRooms = (e) => {
         e.preventDefault();
         sendGet(userForm);
         return false;
       }
 
-      nameForm.addEventListener('submit', addUser);
-      userForm.addEventListener('submit', getUser);
+      roomForm.addEventListener('submit', addRoom);
+      userForm.addEventListener('submit', getRooms);
     };
 
     window.onload = init;
@@ -102,24 +96,23 @@
 
 <body>
   <section id="top">
-    <h3>POST Status Code Tests</h3>
-    <form id="nameForm" action="/addUser" method="post">
+    <form id="roomForm" action="/addRoom" method="post">
       <label for="name">Name: </label>
       <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
-      <input type="submit" value="Add User" />
+      <label for="room">Room Code: </label>
+      <input id="roomField" type="text" name="room" />
+      <input type="submit" value="Create/Join Room" />
     </form>
-    <form id="userForm" action="/getUsers" method="get">
+    <form id="userForm" action="/getRooms" method="get">
       <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
+        <option value='/getRooms'>/getRooms</option>
         <option value='/notReal'>/notReal</option>
       </select>
       <select id="methodSelect">
         <option value="get">GET</option>
         <option value="head">HEAD</option>
       </select>
-      <input type="submit" value="Get User" />
+      <input type="submit" value="Get Rooms" />
     </form>
   </section>
   <section id="content">

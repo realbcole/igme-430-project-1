@@ -2,6 +2,8 @@ const fs = require('fs');
 
 const index = fs.readFileSync(`${__dirname}/../client/client.html`);
 const css = fs.readFileSync(`${__dirname}/../client/style.css`);
+const room = fs.readFileSync(`${__dirname}/../client/room.html`);
+const roomCSS = fs.readFileSync(`${__dirname}/../client/roomStyle.css`);
 
 const getIndex = (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -15,7 +17,21 @@ const getCSS = (req, res) => {
   res.end();
 };
 
+const getRoom = (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.write(room);
+  res.end();
+};
+
+const getRoomCSS = (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/css' });
+  res.write(roomCSS);
+  res.end();
+};
+
 module.exports = {
   getIndex,
   getCSS,
+  getRoom,
+  getRoomCSS,
 };
