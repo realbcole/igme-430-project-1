@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Our simple HTTP server</title>
+  <title>Vote App</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
 
   <script>
@@ -31,7 +31,6 @@
     const init = () => {
       const roomForm = document.querySelector('#roomForm');
 
-
       const addRoom = (e) => {
         e.preventDefault();
         sendPost(roomForm);
@@ -46,13 +45,18 @@
 </head>
 
 <body>
-  <form id="roomForm" action="/addRoom" method="post">
-    <label for="name">Name: </label>
-    <input id="nameField" type="text" name="name" />
-    <label for="room">Room Code: </label>
-    <input id="roomField" type="text" name="room" />
-    <input type="submit" value="Create/Join Room" />
-  </form>
+  <div class="container">
+    <h1>Vote!</h1>
+    <form id="roomForm" action="/addRoom" method="post">
+      <div>
+        <label for="name">Name: </label>
+        <input id="nameField" type="text" name="name" />
+        <label for="room">Room Code: </label>
+        <input id="roomField" type="text" name="room" />
+      </div>
+      <input class="btn" type="submit" value="Create/Join Room" />
+    </form>
+  </div>
 </body>
 
 </html>

@@ -72,6 +72,23 @@
             viewVotes();
         };
 
+        const getRoom = async () => {
+            const url = `/getRoom?code=${roomCode}`;
+
+            let response = await fetch(url, {
+                method: 'get',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+
+            // check response code
+            if (response.status === 404) {
+                // room does not exist
+                window.location.href = '/notFound';
+            }
+        };
+
         voteYes = () => sendVote('yes');
         voteAbstain = () => sendVote('abstain');
         voteNo = () => sendVote('no');
@@ -81,6 +98,9 @@
             const urlParams = new URLSearchParams(window.location.search);
             roomCode = urlParams.get('code');
             document.querySelector('#code').innerHTML = roomCode;
+
+            // check if room exists
+            getRoom();
 
             // add click event listeners to the buttons
             document.querySelector('#yes').addEventListener('click', voteYes);
