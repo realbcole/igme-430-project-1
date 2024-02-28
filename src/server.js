@@ -13,7 +13,7 @@ const urlStruct = {
     '/getRoom': responseHandler.getRoom,
     '/room': htmlHandler.getRoom,
     '/roomStyle.css': htmlHandler.getRoomCSS,
-    notFound: responseHandler.notFound,
+    notFound: htmlHandler.getNotFound,
   },
   HEAD: {
     '/getRooms': responseHandler.getRoomsMeta,
