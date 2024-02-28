@@ -13,8 +13,10 @@
       const nameField = form.querySelector('#nameField');
       const roomField = form.querySelector('#roomField');
 
+      // format the form data
       const formData = `name=${nameField.value}&room=${roomField.value}`;
 
+      // send the form data to the server
       let response = await fetch(url, {
         method: method,
         headers: {
@@ -31,12 +33,14 @@
     const init = () => {
       const roomForm = document.querySelector('#roomForm');
 
+      // callback for the form submission
       const addRoom = (e) => {
         e.preventDefault();
         sendPost(roomForm);
         return false;
       }
 
+      // add the event listener to the form
       roomForm.addEventListener('submit', addRoom);
     };
 

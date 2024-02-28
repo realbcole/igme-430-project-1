@@ -33,9 +33,11 @@ const onRequest = (req, res) => {
   if (!urlStruct[req.method]) return urlStruct.HEAD.notFound(req, res);
 
   if (urlStruct[req.method][parsedUrl.pathname]) {
+    // if the request is a POST, parse the body and send it to the correct handler
     if (req.method === 'POST') {
       return responseHandler.parseBody(req, res, urlStruct[req.method][parsedUrl.pathname]);
     }
+    // otherwise, send it to the correct handler
     return urlStruct[req.method][parsedUrl.pathname](req, res);
   }
 

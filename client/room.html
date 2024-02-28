@@ -9,10 +9,12 @@
         let voteYes, voteAbstain, voteNo;
         let roomCode;
 
+        // fetch the votes from the server
         const fetchVotes = async () => {
-            // fetch the votes from the server
+            // format the URL
             const url = `/getRoom?code=${roomCode}`;
 
+            // send the request to the server
             let response = await fetch(url, {
                 method: 'get',
                 headers: {
@@ -28,15 +30,18 @@
             document.querySelector('#no').innerHTML = `${data.room.votes.no}`;
         };
 
+        // fetch the votes from the server every 3 seconds
         const viewVotes = async () => {
             fetchVotes();
             setInterval(fetchVotes, 3000);
         }
 
+        // send the vote to the server
         const sendVote = async (vote) => {
-            // send the vote to the server
+            // format the vote data
             const data = `vote=${vote}&room=${roomCode}`;
 
+            // send the vote to the server
             let response = await fetch('/vote', {
                 method: 'post',
                 headers: {
@@ -69,12 +74,16 @@
             document.querySelector('#abstain').style.cursor = 'default';
             document.querySelector('#no').style.cursor = 'default';
 
+            // view the votes
             viewVotes();
         };
 
+        // get the room from the server
         const getRoom = async () => {
+            // format the URL
             const url = `/getRoom?code=${roomCode}`;
 
+            // send the request to the server
             let response = await fetch(url, {
                 method: 'get',
                 headers: {
@@ -84,7 +93,7 @@
 
             // check response code
             if (response.status === 404) {
-                // room does not exist
+                // if room does not exist, redirect to the not found page
                 window.location.href = '/notFound';
             }
         };
